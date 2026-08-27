@@ -14,400 +14,506 @@ if not api_key:
 
 ai = genai.Client(api_key=api_key)
 
+
 HTML = """
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My AI Assistant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<title>My AI Assistant</title>
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f7f7f8;
-            color: #111827;
-            height: 100vh;
-            overflow: hidden;
-        }
+<style>
 
-        body.dark {
-            background: #212121;
-            color: #ffffff;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        .app {
-            display: flex;
-            height: 100vh;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f8;
+    color: #111827;
+    height: 100vh;
+    overflow: hidden;
+}
 
-        /* SIDEBAR */
+body.dark {
+    background: #212121;
+    color: white;
+}
 
-        .sidebar {
-            width: 260px;
-            background: #111827;
-            color: white;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s;
-        }
+.app {
+    display: flex;
+    height: 100vh;
+}
 
-        .brand {
-            font-size: 20px;
-            font-weight: bold;
-            padding: 12px;
-            margin-bottom: 15px;
-        }
 
-        .new-chat {
-            width: 100%;
-            padding: 12px;
-            background: #374151;
-            border: 1px solid #4b5563;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
+/* SIDEBAR */
 
-        .new-chat:hover {
-            background: #4b5563;
-        }
+.sidebar {
+    width: 260px;
+    background: #111827;
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
 
-        .history-title {
-            font-size: 12px;
-            color: #9ca3af;
-            margin: 10px 5px;
-        }
+.brand {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px;
+    margin-bottom: 15px;
+}
 
-        #history {
-            flex: 1;
-            overflow-y: auto;
-        }
+.new-chat {
+    width: 100%;
+    padding: 12px;
+    background: #374151;
+    border: 1px solid #4b5563;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
 
-        .history-item {
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.new-chat:hover {
+    background: #4b5563;
+}
 
-        .history-item:hover {
-            background: #374151;
-        }
+.history-title {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 10px 5px;
+}
 
-        .theme-btn {
-            padding: 11px;
-            border: none;
-            border-radius: 9px;
-            background: #374151;
-            color: white;
-            cursor: pointer;
-        }
+#history {
+    flex: 1;
+    overflow-y: auto;
+}
 
-        /* MAIN */
+.history-item {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
+.history-item:hover {
+    background: #374151;
+}
 
-        .topbar {
-            height: 60px;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #e5e7eb;
-            background: white;
-        }
+.theme-btn {
+    padding: 11px;
+    border: none;
+    border-radius: 9px;
+    background: #374151;
+    color: white;
+    cursor: pointer;
+}
 
-        body.dark .topbar {
-            background: #212121;
-            border-color: #3f3f3f;
-        }
 
-        .topbar h2 {
-            font-size: 18px;
-        }
+/* MAIN */
 
-        .menu-btn {
-            display: none;
-            margin-right: 15px;
-            border: none;
-            background: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
 
-        body.dark .menu-btn {
-            color: white;
-        }
+.topbar {
+    height: 60px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    background: white;
+}
 
-        /* CHAT */
+body.dark .topbar {
+    background: #212121;
+    border-color: #3f3f3f;
+}
 
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
-        }
+.topbar h2 {
+    font-size: 18px;
+}
 
-        .welcome {
-            text-align: center;
-            margin-top: 15vh;
-        }
+.menu-btn {
+    display: none;
+    margin-right: 15px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+}
 
-        .welcome h1 {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
+body.dark .menu-btn {
+    color: white;
+}
 
-        .welcome p {
-            color: #6b7280;
-        }
 
-        .message {
-            max-width: 850px;
-            margin: 0 auto 22px;
-            display: flex;
-        }
+/* CHAT */
 
-        .message.user {
-            justify-content: flex-end;
-        }
+#messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+}
 
-        .bubble {
-            max-width: 75%;
-            padding: 13px 17px;
-            border-radius: 15px;
-            line-height: 1.55;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+.welcome {
+    text-align: center;
+    margin-top: 15vh;
+}
 
-        .user .bubble {
-            background: #111827;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
+.welcome h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
 
-        .ai .bubble {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-bottom-left-radius: 4px;
-        }
+.welcome p {
+    color: #6b7280;
+}
 
-        body.dark .ai .bubble {
-            background: #2f2f2f;
-            border-color: #444;
-            color: white;
-        }
+.message {
+    max-width: 850px;
+    margin: 0 auto 22px;
+    display: flex;
+}
 
-        .copy-btn {
-            margin-left: 8px;
-            align-self: flex-end;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            opacity: 0.6;
-        }
+.message.user {
+    justify-content: flex-end;
+}
 
-        body.dark .copy-btn {
-            color: white;
-        }
+.bubble {
+    max-width: 75%;
+    padding: 13px 17px;
+    border-radius: 15px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
 
-        /* INPUT */
+.user .bubble {
+    background: #111827;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
 
-        .input-wrapper {
-            padding: 15px 20px 20px;
-            background: #f7f7f8;
-        }
+.ai .bubble {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-bottom-left-radius: 4px;
+}
 
-        body.dark .input-wrapper {
-            background: #212121;
-        }
+body.dark .ai .bubble {
+    background: #2f2f2f;
+    border-color: #444;
+    color: white;
+}
 
-        .input-box {
-            max-width: 850px;
-            margin: auto;
-            display: flex;
-            gap: 10px;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 15px;
-            padding: 8px;
-        }
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    margin-left: 8px;
+    align-self: flex-end;
+}
 
-        body.dark .input-box {
-            background: #2f2f2f;
-            border-color: #555;
-        }
+.action-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 17px;
+    padding: 4px;
+    opacity: 0.7;
+}
 
-        #question {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 10px;
-            font-size: 15px;
-            background: transparent;
-            color: inherit;
-        }
+.action-btn:hover {
+    opacity: 1;
+}
 
-        #send-btn {
-            border: none;
-            background: #111827;
-            color: white;
-            padding: 0 20px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
 
-        #send-btn:disabled {
-            opacity: 0.5;
-        }
+/* INPUT */
 
-        .typing {
-            max-width: 850px;
-            margin: 0 auto 15px;
-            color: #6b7280;
-            font-size: 14px;
-        }
+.input-wrapper {
+    padding: 15px 20px 20px;
+    background: #f7f7f8;
+}
 
-        /* MOBILE */
+body.dark .input-wrapper {
+    background: #212121;
+}
 
-        @media (max-width: 700px) {
+.input-box {
+    max-width: 850px;
+    margin: auto;
+    display: flex;
+    gap: 7px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 15px;
+    padding: 8px;
+}
 
-            .sidebar {
-                position: fixed;
-                left: -270px;
-                top: 0;
-                bottom: 0;
-                z-index: 10;
-            }
+body.dark .input-box {
+    background: #2f2f2f;
+    border-color: #555;
+}
 
-            .sidebar.open {
-                left: 0;
-            }
+#question {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px;
+    font-size: 15px;
+    background: transparent;
+    color: inherit;
+}
 
-            .menu-btn {
-                display: block;
-            }
+.voice-btn,
+#send-btn {
+    border: none;
+    color: white;
+    padding: 0 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
 
-            #messages {
-                padding: 20px 12px;
-            }
+.voice-btn {
+    background: #4b5563;
+    font-size: 18px;
+}
 
-            .bubble {
-                max-width: 88%;
-            }
+.voice-btn:hover {
+    background: #374151;
+}
 
-            .welcome h1 {
-                font-size: 24px;
-            }
-        }
-    </style>
+.voice-btn.listening {
+    background: #dc2626;
+    animation: pulse 1s infinite;
+}
+
+#send-btn {
+    background: #111827;
+}
+
+#send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.typing {
+    max-width: 850px;
+    margin: 0 auto 15px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        position: fixed;
+        left: -270px;
+        top: 0;
+        bottom: 0;
+        z-index: 10;
+        transition: 0.3s;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .menu-btn {
+        display: block;
+    }
+
+    #messages {
+        padding: 20px 12px;
+    }
+
+    .bubble {
+        max-width: 88%;
+    }
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+
+    .input-wrapper {
+        padding: 10px;
+    }
+
+    .input-box {
+        padding: 6px;
+    }
+
+    .voice-btn,
+    #send-btn {
+        padding: 0 12px;
+    }
+}
+
+</style>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <aside class="sidebar" id="sidebar">
 
-        <div class="brand">
-            🤖 My AI Assistant
-        </div>
+<aside class="sidebar" id="sidebar">
 
-        <button class="new-chat" onclick="newChat()">
-            + New Chat
-        </button>
+    <div class="brand">
+        🤖 My AI Assistant
+    </div>
 
-        <div class="history-title">
-            CHAT HISTORY
-        </div>
+    <button class="new-chat" onclick="newChat()">
+        + New Chat
+    </button>
 
-        <div id="history"></div>
+    <div class="history-title">
+        CHAT HISTORY
+    </div>
 
-        <button class="theme-btn" onclick="toggleTheme()">
-            🌙 Dark / ☀️ Light
-        </button>
+    <div id="history"></div>
 
-    </aside>
+    <button class="theme-btn" onclick="toggleTheme()">
+        🌙 Dark / ☀️ Light
+    </button>
 
-    <main class="main">
+</aside>
 
-        <header class="topbar">
 
-            <button class="menu-btn" onclick="toggleSidebar()">
-                ☰
-            </button>
+<main class="main">
 
-            <h2>AI Assistant</h2>
 
-        </header>
+<header class="topbar">
 
-        <div id="messages">
+    <button class="menu-btn" onclick="toggleSidebar()">
+        ☰
+    </button>
 
-            <div class="welcome" id="welcome">
-                <h1>👋 How can I help you?</h1>
-                <p>Ask me anything and I'll try my best to help.</p>
-            </div>
+    <h2>AI Assistant</h2>
 
-        </div>
+</header>
 
-        <div class="input-wrapper">
 
-            <div class="input-box">
+<div id="messages">
 
-                <input
-                    id="question"
-                    type="text"
-                    placeholder="Message AI Assistant..."
-                    autocomplete="off"
-                >
+    <div class="welcome" id="welcome">
 
-                <button id="send-btn" onclick="sendMessage()">
-                    Send
-                </button>
+        <h1>👋 How can I help you?</h1>
 
-            </div>
+        <p>
+            Ask me anything or use 🎤 voice input.
+        </p>
 
-        </div>
-
-    </main>
+    </div>
 
 </div>
 
+
+<div class="input-wrapper">
+
+    <div class="input-box">
+
+        <input
+            id="question"
+            type="text"
+            placeholder="Message AI Assistant..."
+            autocomplete="off"
+        >
+
+        <button
+            class="voice-btn"
+            id="voice-btn"
+            onclick="startVoice()"
+            title="Speak"
+        >
+            🎤
+        </button>
+
+        <button
+            id="send-btn"
+            onclick="sendMessage()"
+        >
+            Send
+        </button>
+
+    </div>
+
+</div>
+
+
+</main>
+
+</div>
+
+
 <script>
 
+
 const input = document.getElementById("question");
+
 const messages = document.getElementById("messages");
+
 const sendBtn = document.getElementById("send-btn");
+
+const voiceBtn = document.getElementById("voice-btn");
+
 const history = document.getElementById("history");
 
-let chats = JSON.parse(localStorage.getItem("ai_chats") || "[]");
+
+let chats = JSON.parse(
+    localStorage.getItem("ai_chats") || "[]"
+);
+
+
+/* ENTER TO SEND */
 
 input.addEventListener("keydown", function(event) {
 
     if (event.key === "Enter") {
+
         sendMessage();
+
     }
 
 });
+
+
+/* ADD MESSAGE */
 
 function addMessage(text, type) {
 
@@ -417,63 +523,125 @@ function addMessage(text, type) {
         welcome.remove();
     }
 
+
     const message = document.createElement("div");
+
     message.className = "message " + type;
 
+
     const bubble = document.createElement("div");
+
     bubble.className = "bubble";
+
     bubble.textContent = text;
+
 
     message.appendChild(bubble);
 
+
     if (type === "ai") {
+
+        const actions = document.createElement("div");
+
+        actions.className = "action-buttons";
+
+
+        /* COPY */
 
         const copy = document.createElement("button");
 
-        copy.className = "copy-btn";
+        copy.className = "action-btn";
+
         copy.textContent = "📋";
 
+        copy.title = "Copy";
+
         copy.onclick = function() {
+
             navigator.clipboard.writeText(text);
+
             copy.textContent = "✅";
 
             setTimeout(function() {
+
                 copy.textContent = "📋";
+
             }, 1500);
+
         };
 
-        message.appendChild(copy);
+
+        /* SPEAK */
+
+        const speak = document.createElement("button");
+
+        speak.className = "action-btn";
+
+        speak.textContent = "🔊";
+
+        speak.title = "Read answer";
+
+        speak.onclick = function() {
+
+            speakText(text);
+
+        };
+
+
+        actions.appendChild(copy);
+
+        actions.appendChild(speak);
+
+        message.appendChild(actions);
+
     }
+
 
     messages.appendChild(message);
 
     messages.scrollTop = messages.scrollHeight;
+
 }
+
+
+/* SEND MESSAGE */
 
 async function sendMessage() {
 
     const question = input.value.trim();
 
+
     if (!question) {
+
         return;
+
     }
+
 
     addMessage(question, "user");
 
+
     input.value = "";
 
+
     sendBtn.disabled = true;
+
     sendBtn.textContent = "Thinking...";
+
 
     const typing = document.createElement("div");
 
     typing.className = "typing";
+
     typing.id = "typing";
+
     typing.textContent = "🤖 AI is thinking...";
+
 
     messages.appendChild(typing);
 
     messages.scrollTop = messages.scrollHeight;
+
 
     try {
 
@@ -482,37 +650,57 @@ async function sendMessage() {
             method: "POST",
 
             headers: {
+
                 "Content-Type": "application/json"
+
             },
 
             body: JSON.stringify({
+
                 question: question
+
             })
 
         });
 
+
         const data = await response.json();
 
-        const typingElement = document.getElementById("typing");
+
+        const typingElement =
+            document.getElementById("typing");
+
 
         if (typingElement) {
+
             typingElement.remove();
+
         }
 
-        addMessage(
-            data.answer || "Sorry, I couldn't generate a response.",
-            "ai"
-        );
 
-        saveChat(question, data.answer);
+        const answer =
+            data.answer ||
+            "Sorry, I couldn't generate a response.";
+
+
+        addMessage(answer, "ai");
+
+
+        saveChat(question, answer);
+
 
     } catch (error) {
 
-        const typingElement = document.getElementById("typing");
+        const typingElement =
+            document.getElementById("typing");
+
 
         if (typingElement) {
+
             typingElement.remove();
+
         }
+
 
         addMessage(
             "❌ Unable to connect to the server. Please try again.",
@@ -521,30 +709,51 @@ async function sendMessage() {
 
     }
 
+
     sendBtn.disabled = false;
+
     sendBtn.textContent = "Send";
 
     input.focus();
+
 }
+
+
+/* SAVE CHAT */
 
 function saveChat(question, answer) {
 
     chats.unshift({
+
         question: question,
+
         answer: answer,
+
         time: new Date().toLocaleString()
+
     });
+
 
     chats = chats.slice(0, 20);
 
-    localStorage.setItem("ai_chats", JSON.stringify(chats));
+
+    localStorage.setItem(
+        "ai_chats",
+        JSON.stringify(chats)
+    );
+
 
     renderHistory();
+
 }
+
+
+/* HISTORY */
 
 function renderHistory() {
 
     history.innerHTML = "";
+
 
     chats.forEach(function(chat) {
 
@@ -554,70 +763,225 @@ function renderHistory() {
 
         item.textContent = chat.question;
 
+
         item.onclick = function() {
 
             messages.innerHTML = "";
 
             addMessage(chat.question, "user");
+
             addMessage(chat.answer, "ai");
 
         };
 
+
         history.appendChild(item);
 
     });
+
 }
+
+
+/* NEW CHAT */
 
 function newChat() {
 
     messages.innerHTML = `
+
         <div class="welcome" id="welcome">
+
             <h1>👋 How can I help you?</h1>
-            <p>Ask me anything and I'll try my best to help.</p>
+
+            <p>
+                Ask me anything or use 🎤 voice input.
+            </p>
+
         </div>
+
     `;
+
 
     input.focus();
 
+
     if (window.innerWidth <= 700) {
-        document.getElementById("sidebar").classList.remove("open");
+
+        document
+            .getElementById("sidebar")
+            .classList
+            .remove("open");
+
     }
+
 }
+
+
+/* DARK LIGHT */
 
 function toggleTheme() {
 
     document.body.classList.toggle("dark");
 
+
     localStorage.setItem(
+
         "theme",
+
         document.body.classList.contains("dark")
-        ? "dark"
-        : "light"
+            ? "dark"
+            : "light"
+
     );
+
 }
+
+
+/* SIDEBAR */
 
 function toggleSidebar() {
 
-    document.getElementById("sidebar")
-        .classList.toggle("open");
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("open");
 
 }
 
-if (localStorage.getItem("theme") === "dark") {
+
+/* VOICE INPUT */
+
+function startVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        alert(
+            "Voice input is not supported in this browser. Please use Google Chrome."
+        );
+
+        return;
+
+    }
+
+
+    const recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang = "en-IN";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+
+    voiceBtn.classList.add("listening");
+
+    voiceBtn.textContent = "🔴";
+
+
+    recognition.start();
+
+
+    recognition.onresult = function(event) {
+
+        const transcript =
+            event.results[0][0].transcript;
+
+
+        input.value = transcript;
+
+        input.focus();
+
+    };
+
+
+    recognition.onerror = function(event) {
+
+        console.log(
+            "Voice error:",
+            event.error
+        );
+
+    };
+
+
+    recognition.onend = function() {
+
+        voiceBtn.classList.remove("listening");
+
+        voiceBtn.textContent = "🎤";
+
+    };
+
+}
+
+
+/* TEXT TO SPEECH */
+
+function speakText(text) {
+
+    if (!("speechSynthesis" in window)) {
+
+        alert(
+            "Text-to-speech is not supported in this browser."
+        );
+
+        return;
+
+    }
+
+
+    window.speechSynthesis.cancel();
+
+
+    const speech =
+        new SpeechSynthesisUtterance(text);
+
+
+    speech.lang = "en-IN";
+
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+
+    window.speechSynthesis.speak(speech);
+
+}
+
+
+/* LOAD THEME */
+
+if (
+    localStorage.getItem("theme") === "dark"
+) {
+
     document.body.classList.add("dark");
+
 }
+
+
+/* LOAD HISTORY */
 
 renderHistory();
+
 
 </script>
 
 </body>
+
 </html>
 """
 
 
 @app.route("/")
 def home():
+
     return render_template_string(HTML)
 
 
@@ -628,32 +992,54 @@ def chat():
 
     question = data.get("question", "").strip()
 
+
     if not question:
+
         return jsonify({
+
             "answer": "Please enter a question."
+
         })
+
 
     try:
 
         response = ai.models.generate_content(
+
             model="gemini-3.5-flash-lite",
+
             contents=question
+
         )
 
+
         return jsonify({
+
             "answer": response.text
+
         })
 
-    except Exception:
+
+    except Exception as error:
+
+        print("Gemini Error:", error)
 
         return jsonify({
-            "answer": "Sorry, something went wrong. Please try again."
+
+            "answer":
+                "Sorry, something went wrong. Please try again."
+
         }), 500
 
 
 if __name__ == "__main__":
+
     app.run(
+
         host="0.0.0.0",
+
         port=5000,
+
         debug=True
+
     )
